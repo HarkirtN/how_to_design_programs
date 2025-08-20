@@ -54,4 +54,48 @@
 
 (define (payback charges) ( * (percentage-payback charges) charges))
 
+;;symbols
+(define (reply s) (cond
+                    [(symbol=? s 'GoodMorning) 'Hi]
+                    [(symbol=? s 'HowAreYou?) 'Fine]
+                    [(symbol=? s 'GoodAfternoon) 'INeedANap]
+                    [(symbol=? s 'GoodEvening) 'BoyAmITired]))
+
+;;check guess
+(define (check-guess guess target) (cond
+                                     [(symbol=? (< guess target)) 'TooSmall]
+                                     [(symbol=? (= guess target)) 'Perfect]
+                                     [(symbol=? (> guess target)) 'TooLarge]))
+
+;;check colour
+(define (check-colour target1 target2 guess1 guess2) (cond
+                                                       [(symbol=? ( and (= guess1 target1) (= guess2 target2))) 'Perfect]
+                                                       [(symbol=? (or (= guess1 target1) (= guess2 target2))) 'OneColourAtCorrectPosition]
+                                                       [(symbol=? (or (= guess1 target2) (= guess2 target1))) 'OneColourOccurs]
+                                                       [else 'NothingCorrect]))
+;; structures
+;; structures are like arrays i.e. list and you can use this to extract information later on 
+;;(define a-posn (make-posn 3 4))
+
+;;(define (distance-to-0 a-posn) (sqrt (+ ( sqr (posn-x a-posn)) (sqr (posn-y a-posn)))))
+
+(define-struct sandwhich (bread sauce cheese))
+(make-sandwhich 'freyas 'mustard 'tastycheese)
+
+;; so when you call for cheese you write
+(sandwhich-cheese (make-sandwhich 'freyas 'mustard 'tastycheese))
+;; it will return 'tastycheese
+
+;; same would go for ohone book entry first define-structure : entry i.e name phone address
+(define-struct entry (name phonenumber address))
+
+;; then next would be inputing informtion i.e. make-entry joe 0214 litestreet
+(make-entry 'joe 'unknown 'litestreet)
+
+;; to call for phonenumber
+(entry-phonenumber (make-entry 'joe 'unknown 'litestreet))
+
+
+
+
   
