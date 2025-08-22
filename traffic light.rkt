@@ -81,5 +81,5 @@
                                 [(and (symbol=? current-colour 'green) (switch 'green 'yellow)) 'yellow]))
 
 (start WIDTH HEIGHT)
-(draw-bulb 'red)
+;;(draw-bulb 'red)
 (next 'red)
