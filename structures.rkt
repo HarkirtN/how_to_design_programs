@@ -34,9 +34,9 @@
 (define (reduce-range jetfighter) (make-jetfighter (jetfighter-designation jetfighter)
                                                    (jetfighter-acceleration jetfighter)
                                                    (jetfighter-topspeed jetfighter)
-                                                   ( - (jetfighter-range jetfighter) (* jetfighter 0.8))))
+                                                   ( - (jetfighter-range jetfighter) (* jetfighter 0.2))))
 
-;;range 500 - to reduce this by 80% = 500 - (500 x 0.80)
+;;range 500 - to reduce this to 80% = 500 - (500 x 0.2)
 
 
 ;;Exercise 6.4.1
@@ -84,66 +84,76 @@
   ;; to develop coloured circles
   ;; structure definition to incorporate centre, radius, colour
   (define-struct circle (centre radius colour))
-      ;; data definition circle = (structure, number, symbol)
 
+;; data definition circle = (structure, number, symbol)
+(define a-circle (make-circle (make-posn 0 100) 20 'blue))
+  
 ;; Template
-           (define (fun-for-circle a-circle) (... (circle-centre a-circle)...
-                                            ... (circle-radius a-circle)...
-                                            ... (circle-colour a-circle)...))
+          ;; (define (fun-for-circle a-circle) (... (circle-centre a-circle)...
+                                          ;;    ... (circle-radius a-circle)...
+                                          ;;    ... (circle-colour a-circle)...))
 
-          (define (draw-a-circle circle) (make-circle (circle-centre circle)
-                                                      (circle-radius circle)
-                                                      (circle-colour circle)))
-
-
-(make-circle (make-posn 20 20) 5 'red)
-
-(start 300 300)
-(draw-a-circle (make-circle (make-posn 20 20) 5 'red))
-
-  ;; to calculate whether the pixel is within the circle
-  ;;if pixels distance to the centre is less or equal to radius of circle = in the circle
-;; posn - circle centre
+    (define (draw-a-circle a-circle) (draw-circle (circle-centre a-circle)
+                                                  (circle-radius a-circle)
+                                                  (circle-colour a-circle)))
 
 
-;;(define (posn-minus lhs rhs) (lhs ( - ( posn-x a-posn) (posn-X circle-centre))) (rhs( - (posn-y a-posn) (posn-y circle-centre))))
-(define (posn-minus lhs rhs) (make-posn (- (posn-x lhs) (posn-x rhs)) (- (posn-y lhs) (posn-y rhs))))
-(define (hypot posn) (+ (* (posn-x posn) (posn-x posn)) (* (posn-y posn) (posn-y posn))))
 
 
-(define (in-circle circle a-posn) (<= (hypot (posn-minus (circle-centre circle) a-posn)) (* (circle-radius circle) (circle-radius circle))))
-  ;; (define (in-circle circle a-posn) (cond 
+
+
+;; Exercise : to calculate whether the pixel is within the circle
+ 
+;; #1 practice
+;; (define (in-circle circle a-posn) (cond 
                                 ;; [ ( <= ((sqr ( - (posn-X a-posn)(posn-X circle)) + ( sqr ( - (posn-Y a-posn) (posn-Y circle))) circle-radius circle) 'inside)]
                                  ;;[ else 'outside]))
 
-;; centre is the circle that is right to the number of pixels 
-(define (translate-circle circle delta) (make-circle ( make-posn (+ delta (posn-x (circle-centre circle)))
-                                                      (posn-y (circle-centre circle))) 
-                                                      (circle-radius circle)
-                                                      (circle-colour circle)))
+   ;; first we must breakdown into axillary functions for calculating pythagoras
+   ;;first step is to make a new position the difference between the original positions
+              ;; #1 practice
+              ;;(define (posn-minus lhs rhs) (lhs ( - ( posn-x a-posn) (posn-X circle-centre))) (rhs( - (posn-y a-posn) (posn-y circle-centre))))
 
-;; to clear a circle
-(define (clear-a-circle circle) (clear-circle (make-circle (circle-centre circle)
-                                                             (circle-radius circle)
-                                                             (circle-colour circle))))
+    (define (posn-minus lhs rhs)( make-posn ( - (posn-x lhs) (posn-x rhs)) ( - (posn-y lhs) (posn-y rhs))))
 
-;; to draw then wait then clear a circle
-(define (draw-and-clear-circle circle) (and (make-circle (circle-centre circle)
-                                                      (circle-radius circle)
-                                                      (circle-colour circle))
-                                              (sleep-for-a-while ...)
-                                              (clear-circle (circle-centre circle)
-                                                             (circle-radius circle)
-                                                             (circle-colour circle))))
-                                          
-;;move circle : number circle -> circle
+                    ;; then complete a hypotenuese calcution for squaring
+                       (define (hypot posn) ( + ( sqr (posn-x posn)) ( sqr (posn-y posn))))
+
+                             ;;then complete calculation for pythagoras whether the vector/distance is less than or equal to radius squared = in-circle function
+                              (define (in-circle circle a-posn) ( <= ( hypot (posn-minus a-posn (circle-centre circle))) ( sqr (circle-radius circle))))
+
+
+
+;; Exercise - centre is the circle that is right to the number of pixels 
+
+ (define (translate-circle a-circle delta) (make-circle
+                                           (make-posn (+ delta (posn-x (circle-centre a-circle))) (posn-y (circle-centre a-circle)))
+                                           (circle-radius a-circle)
+                                           (circle-colour a-circle)))
+
+
+;; Exercise - to clear a circle
+
+ (define (clear-a-circle a-circle) (clear-circle (circle-centre a-circle)
+                                                (circle-radius a-circle)
+                                                'white))
+
+
+;; Exercise - to draw then wait (sleep-for-a-while) then clear a circle
+ (define (draw-and-clear-circle a-circle) [ and (draw-a-circle a-circle)
+                                                (sleep-for-a-while .1)
+                                                (clear-a-circle a-circle)
+                                                true])
+
+;; Exercise - move circle : number circle -> circle
 ;;to draw and clear a circle, translate it by delta pixels
-(define (move-circle delta circle) (cond
-                                       [(draw-and-clear-circle circle) (translate-circle circle delta)]
-                                       [else circle]))
+( define (move-circle delta a-circle) (cond [(draw-and-clear-circle a-circle) ( translate-circle a-circle delta)]
+                                            [else a-circle]))
 
-(start 200 100)
-(draw-a-circle (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 (make-circle (make-posn 20 20) 5 'red))))))
+(start 200 200)
+
+(draw-a-circle (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 (move-circle 10 a-circle))))))))))))
+
 
 
 
