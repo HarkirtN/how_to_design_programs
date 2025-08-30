@@ -20,3 +20,17 @@
 (define hours 30)
 (define pay (+ 12 hours))
 (define distance-of-moon (* pi (* monkeys zoo )))
+
+;; structure definitions
+;; i.e. illegal ones
+;;(define oops ())
+;;(define (child person) (dob date))
+
+;;values
+;;(make-point 1 2 3) = 1 2 3
+;;(make-point (make-point 1 2 3) 4 5) = (make-point 1 2 3) 4 5
+
+;;predicates
+(define-struct ball (x y speed-x speed-y))
+(number? (make-ball 1 2 3 4)) = false
+(ball-speed-y (make-ball (+ 1 2) (+ 3 3) 2 3)) = 3
