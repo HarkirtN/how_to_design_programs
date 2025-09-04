@@ -133,15 +133,21 @@
                                                     (many-numbers (rest a-list)))]))
 
 ;;Exercise 9.5.3
+;; to provide conditions that allow the computer to exit out of loop
+;; i.e. empty (base case) holds true as it suggest end of list and should exit out
+
 (define (dollar-store? a-list) (cond
                                 [(empty? a-list) true]
+
+;; then if the first is above $1 then there is no point looking into the (rest a-list) so should catch this by : < 1 (first a-list) return false
                                 [( cond
-                                     [(> 1 (first a-list) true) (dollar-store? (rest a-list)) true]
-                                     [else false])]))
+                                     [(< 1 (first a-list) false]
 
-;;test example : (dollar-store? (cons .75 (cons .95 (cons .25 empty))))
+;; last condition should be the recursive for (rest a-list)
+                                     [else (dollar-store? (rest a-list))]
 
-;;test example : (not (dollar-store? (cons .75 (cons 1.95 (cons .25 empty)))))
+  ;;test example : (dollar-store? (cons .75 (cons .95 (cons .25 empty))))
+    ;;test example : (not (dollar-store? (cons .75 (cons 1.95 (cons .25 empty)))))
 
 
 ;; Exercise 9.5.4
@@ -151,23 +157,82 @@
                                 ;;[(empty? a-list) false]
                                 ;;[else ... (first a-list) (check-range1 (rest a-list)) ...]))
 
-;;parameters for each list ( and (<= 5 a-list) (>= 95 a-list)) to return true
+;;going back to helping the computer exit the loop
+(define (check-range1 a-list) (cond
+                                [(empty? a-list) true]
+                                
+;;parameters for each list ( and (<= 5 a-list) (>= 95 a-list)) to return false
+                                [(and (<= 5 (first a-list)) (>= 95 (first a-list))) false]
 
-
-;; break this down because i will be checking 'true' for each (first a-list) statements
-  ;; (<= 5 (first a-list) true)
-  ;; (>= 95 (first a-list) true)
-
-
-;;then if both are true you can look into the rest of the list and create a recursive definition
+;;then if first a-list member is actually true it will continue to the recursive definition
 ;; ( check-range1 (rest a-list))
-
-  (define (check-range1 a-list) (cond
-                                [(empty? a-list) false]
-                                [(and (<= 5 (first a-list) (>= 95 (first a-list))))true]
-                                (check-range1 (rest a-list))) true]
-                                  [else false])]))
+                                  [else (check-range1 (rest a-list))]
 
 
-  (check-range1 (cons 10 (cons 20 (cons 75 empty))))
-  (check-range1 (cons 100 (cons 10 empty)))
+      ;; test example :(check-range1 (cons 10 (cons 20 (cons 75 empty))))
+      ;; test example :(check-range1 (cons 100 (cons 10 empty)))
+
+
+;;Exercise 9.5.6
+;; to compute the difference between two inventory lists and return positive if there is an increase or negative if a decrease 
+
+    ;;First create auxillary functions the add the values of a-list and b-list
+      (define (sum-of-a-list a-list) (cond
+                                [(empty? a-list) 0]
+                                [ else ( + (first a-list) 
+                                      (sum-of-a-list (rest a-list)))]))
+
+      (define (sum-of-b-list b-list) (cond
+                                 [(empty? b-list) 0]
+                                 [ else (+ (first b-list) (sum-of-b-list (rest b-list)))]))
+
+;; to find the difference and return positive or negative
+      (define (delta a-list b-list) (cond
+                                [(empty? a-list b-list) true]
+                                [(> (sum-of-a-list) (sum-of-b-list)) positive]
+                                [ else negative]))
+
+;;Functions that produce lists
+      ;;hours -> wages : list-of-numbers -> list-of-numbers
+      ;; to create a list of weekly wages from a list of hours worked by employees
+      (define (wages hours) (* 12 hours))
+      
+      (define (hours-to-wages a-list) (cond
+                                        [(empty? a-list) empty]
+                                        [else (cons (wages (first a-list)) (hours-to-wages (rest a-list)))]))
+
+;;Exercise 10.1.2
+  ;; no employee should work more than 100 hours, to return error message if one of them does
+    (define (check-hours hours) (cond
+                                   [(> 100 a-list)]
+                                   [else (error 'a-list "hours exceed legal requirement")]))
+
+    ;; redefine hours-to-wages definition
+    (define (hours-to-wages a-list) (cond
+                                      [(empty? a-list) 0]
+                                      [else (cons (check-hours (first a-list)) (hours-to-wages (rest a-list)))]))
+;;Exercise 10.1.3
+    ;;convert list if farenheit to celisius list of numbers
+
+    ;;define the function that converts convertfc : list of numbers -> list of numbers = f -> c
+    (define (convert-to-celsius farenheit) (( * (- farenheit 32) (5/9))))
+    
+    (define (convert-list f-list) (cond
+                                          [(empty? f-list) empty]
+                                          [else (cons (convert-to-celsius (first f-list))(convert-list (rest f-list)))]))
+;;Exercise 10.1.5
+    ;; eliminate items (toys) from list that exceeds/equal to number (ua)
+    ;; eliminate-exp : list of toys -> list of toys
+
+      ;;develop auxillary function i.e. too-expensive
+      (define ua ...)
+      (define (too-expensive toy) (<= ua toy))
+
+       ;;template for creating list from a list
+        ;;(define (eliminate-exp lotp) (cond
+                                         ;;[(empty? t-list) true]
+                                         ;;[ else (first lotp) ... (rest lotp)...]))
+
+      (define (eliminate-exp lotp) (cond
+                                     [(empty? lotp) true]
+                                     [else (cons (too-expensive (first lotp))) (eliminate-exp (rest lotp))]))
