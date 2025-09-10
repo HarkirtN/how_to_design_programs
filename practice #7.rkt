@@ -104,7 +104,7 @@
 ;;Exercise 10.1.7
 ;; recall function eliminates any toys called 'ty' from list 'lon'
 (define (recall ty lon) (cond
-                          [(empty? lon) empty]
+                          [(empty? lon) 'empty]
                           [(not (symbol=? 'ty (first lon)))
                            (cons (first lon) (recall ty (rest lon)))]
                           [else (recall ty (rest lon))]))
@@ -113,3 +113,12 @@
 (recall 'robot (cons 'robot
                   (cons 'doll
                         (cons 'dress empty))))
+
+;;Exercise 10.2.7
+;; compute an inventory list the produces all items except those labelled 'ty'
+;; recall1 : inventory-list symbol -> inventory-list
+(define (recall1 symbol inventory) (cond
+                                     [(empty? inventory) 'empty]
+                                     [(not (symbol=? 'ty (inventory-name (first inventory))))
+                                      (cons (first inventory)(recall1 symbol (rest inventory)))]
+                                     [else (recall1 symbol (rest inventory))]))
