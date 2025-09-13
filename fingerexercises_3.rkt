@@ -96,6 +96,8 @@
 
 (contains? 'ball (cons 'bow (cons 'arrow (cons 'ball empty))))
 
+
+
 ;; Notes about second cond clause  
 ;; needs an additional cond clause because we are asking a question of the (first) item so we need nested condition
 ;; then (rest) to then exit out of the recursion; the OR simplifies the second 'else'
@@ -109,8 +111,124 @@
                              [(empty? lon) empty]
                              [else (number? (first lon)(+ 1 (many-numbers (rest lon))))]))
 
-;; they differ because the symbol could be anything therefore can be generalised to just adding one and going through the list
+;; they differ because the symbol could be anything therefore can be generalised to adding one and going through the (rest) list
 ;; whereas number you can place a predicate to check whether it is infact a number then +1 and move onto (rest lon)
 
+;;to check whether all prices are below $1 - keyword 'ALL'
+;; dollar-store? : list -> boolean
+         (define (dollar-store? lon) (cond
+                                       [(empty? lon) true]
+                                       [else (cond
+                                               [(< 1(first lon)) false]
+                                               [else (dollar-store? (rest lon))])]))
+
+;;to check whether a list of temperatures are all within range keyword 'ALL' which means we need to develop a function that detects those not in range
+;; and exit if met
+;; check-range1 : lot -> boolean
+
+;;first draft 
+          (define (check-range1 lot) (cond
+                                       [(empty? lot) true]
+                                       [else (cond
+                                               [(or ( > 5 (first lot)) (< 95 (first lot))) false]
+                                               [else (check-range1 (rest lot))])]))
+
+;;or develop auxillary function for checking temperature
+      (define (check-temperature temperature) (or (> 5 temperature) (< 95 temperature)))
+
+;;then refined check-range1
+            (define (check-range2 lot) (cond
+                                         [(empty? lot) 'empty]
+                                         [else (cond
+                                                 [(check-temperature (first lot)) false]
+                                                 [else (check-range2 (rest lot))])]))
+
+;; create a function goes through a list of numbers and produces corresponding number 
+  (define (convert lod) (cond
+                          [(empty? lod) 0]
+                          [else (+
+                                 (* 10 (convert (rest lod)))
+                                   (first lod))]))
+
+;;test
+   (convert (cons 1 (cons 2 (cons 3 (cons 4 (cons 199 empty))))))
+;; [1, 2, 3, 4, 199] = 9914321
+;; 199 x 10 = 1990
+;; (1990 x 10) + (4 x 10)                                       = 19900 + 40           = 19940
+;; (19900 x 10) + (40 x 10) + (3 x 10)                          = 199000 + 400 + 30     = 199430
+;; (199000 x 10) + (400 x 10) + (30 x 10) + (2 x 10)            = 1990000 + 4000 + 300 + 20 = 1994320
+;; second last bracket stops *10 then you just add (first lod)  = 1990000 + 4000 + 300 + 20 + 1 = 1994321
+
+(define target 123)
+(define (check-guess3 lod) (cond
+                                    [(< target (+ (* 10 (check-guess3 (rest lod))) (first lod))) 'TooSmall]
+                                    [(= target(+ (* 10 (check-guess3 (rest lod))) (first lod))) 'Perfect]
+                                    [(> target ( + (* 10 ( check-guess3 (rest lod))) (first lod))) 'TooLarge]))
+;; add-up-list : lon -> number
+(define (add-up-list1 lon) (cond
+                            [(empty? lon) 0]
+                            [else (+ (first lon)
+                                     (add-up-list1 (rest lon)))]))
+
+(define (add-up-list2 lon) (cond
+                             [(empty? lon) 0]
+                             [else (+ (first lon)
+                                      (add-up-list2 (rest lon)))]))
+
+;; delta : list -> scheme symbol 
+(define (delta lon1 lon2) (cond
+                            [(and (empty? lon1) (empty? lon2)) 'empty]
+                            [else (cond
+                                     [(< (add-up-list1 lon1) (add-up-list2 lon2)) 'positive]
+                                     [else 'negative])]))
+;; test
+(define list-a (cons 1 (cons 2 empty)))
+
+(define list-b empty)
+
+(add-up-list1 list-a)
+(add-up-list2 list-b)
+(delta list-a list-b)
+
+;;average-price : lot -> number
+;; to compute the average price by dividing the sum by number of toys
+
+;;first auxillary functions
+;; sum-of-toys : list -> number
+(define (sum-of-toys lot) (cond
+                            [(empty? lot) 0]
+                            [else (+ (first lot) (sum-of-toys (rest lot)))]))
+
+(define (number-of-toys lot) (cond
+                               [(empty? lot) 0]
+                               [else (+ 1 (number-of-toys (rest lot)))]))
+
+   (define (checked-average-price lot) (cond
+                                      [(cons? lot) (/ (sum-of-toys lot-price) (number-of-toys lot-price))]
+                                      [else (error 'average-price "expected list")]))
+
+            (define (average-price lot-price) (checked-average-price lot-price))
+
+
+;;test
+(define lot-price (cons 5.00 (cons 5.00 (cons 10.00 empty))))
+(define lot-nothing empty)
+
+(sum-of-toys lot-price)
+(number-of-toys lot-price)
+
+
+;;(average-price lot-nothing)
+
+;;draw-circles : posn lon -> boolean
+;; to check whether all circles in the list can be drawn keyword 'All'
+
+(define (draw-circles posn lon) (cond
+                                  [(empty? lon) 'empty]
+                                  [(not (and (draw-circle posn (first lon) 'red)(draw-circles (rest lon)))) false]
+                                  [else (error 'draw-circles "not all circles can fit")])
+;;test
+
+(start 300 300)
 
 
