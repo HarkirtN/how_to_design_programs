@@ -31,20 +31,21 @@
                      [else (cons 'repeat (repeat (sub1 n)))]))
 
 ;; tabulates the values of f a create a list on n posns
-(define x 1)
+(define x 5)
 ;; auxillary function
 (define (f x)(+
               (* 3 (* x x))
                 (+ (* -6 x) -1)))
 
 ;; f : number -> number
-;;(define (tabulate-f f n) (cond
-               ;; [(zero? n) 0]
-                ;;[else (cons (tabulate-f f (sub1 n)) (f (f x)))]))
+(define (tabulate-f n) (cond
+                     [(zero? n) empty]
+                     [else (cons (- n 1) (tabulate-f (sub1 n)))]))
+
 
 ;;test
-(f 4)
-;;(tabulate-f 4)
+(tabulate-f 5)
+
 
 ;;exercise 11.2.4
 ;;deep-list : list -> number
@@ -95,6 +96,7 @@
        ;;test example
        (random-n-m 10 800)
 
+
 ;;Exercise 11.3.2
 ;;tie-dyed : number -> list of random numbers
 
@@ -103,13 +105,99 @@
 (randomised-n 20 120)
 
 ;;then use that random number to create a list
-(define (tie-dyed randomised) (cond
-                            [(randomised-n 20 120)(zero? randomised) empty]
-                            [(randomised-n 20 120)(cons 'list (tie-dyed (sub1 randomised)))]
-                            [else (error 'tie-dyed "expected natural number")]))
-                                    
-(define (tie-dyed number-20-120)
-;;test
-(tie-dyed ...)
+;;(define (tie-dyed randomised) (cond
+;;                            [(zero? randomised) empty]
+;;                            [(randomised-n 20 120) (cons 'list (tie-dyed (sub1 randomised)))]
+;;                            [else (error 'tie-dyed "expected natural number")]))
 
+(define (tie-dyed number) (cond
+                                [(zero? number) empty]
+                                [else (cons (randomised-n 20 120) (tie-dyed (sub1 number)))]))
+                              
+;;test
+(tie-dyed 0)
+(tie-dyed 1)
+(tie-dyed 2)
+(tie-dyed 10)
+
+
+;;Exercise 11.3.3
+;;create temps : number, high, & low temp -> list
+;; to create a list of temperature between the low and high x number of times
+(define (create-temps x low high) (cond
+                                    [(zero? x) empty]
+                                    [else (cons (randomised-n low high) (create-temps (sub1 x) low high))]))
+;;test
+(create-temps 3 50 100)
+
+;;can we feed create-temps list into check-range
+;; let's try
+;;(define (check-temperature temp) (or (> 5 temp) (< 95 temp)))
+
+;;(define (check-range1 x low high) (cond
+                              ;; [(empty? (create-temps x low high)) empty]
+                               ;;[else (cond
+                               ;;  [(check-temperature (first (create-temps x low high))) false]
+                                ;; [else (check-temperature (rest (create-temps x low high)))])]))
+
+;;test
+;;(check-range1 5 10 150)
+
+;;food for thought
+;; can we simply feed it into the check-range function - it expects a real number for the check-temperature function where first does not extract the value only provides the whole list
+
+;; values of low and high needed ? No because the check-temperature function's purpose is to detect out-of-range temps, ultimately both want to achieve similar result
+  ;;i.e. check-temperature check out of range temps
+  ;;i.e. create-temps produce a randomised list within range is it safe to say that this will always be within the range 5-95 if parameters are set
+
+;; what does this say about testing with auto generated data = that you could create a test using just AGD if parameters are set
+
+;;Exercise 11.3.4
+;; create-prices : number -> list
+;; to produce a list of prices between $0.10 - $10 in increments of 0.10 (dimes)
+
+;;alter the randomisation function?
+(define (random-dime l m) (/ (+ ( random (- (* 100 m) (* 100 l))) l) 100))
+
+;; increments of 0.10
+(define (create-prices n dime dollar) (cond
+                                        [(zero? n) empty]
+                                        [else (cons (... (random-dime dime dollar)) (create-prices (sub1 n) dime dollar))]))
+
+;;test
+(random-dime 0.10 10)
+(create-prices 5 0.10 10)
+
+;;Exercise 11.4.1
+(define (! n) (cond
+                [(zero? n) 1]
+                [else (* n (! (sub1 n)))]))
+;;this function attempts to multiply all numbers from n to 0 (excludes 0)
+;;first function resolves the issue of no numbers between 0 - 0 by setting !0 equal to 1
+
+;;test 
+(! 4) ;; 4 * 3 * 2 * 1
+(! 5) ;; 5 * 4 * 3 * 2 * 1
+
+;; then you can utilise (!) to multiply n from n for example a product from 20 will multiply all number greater than 20 to n
+
+;; Exercise 11.4.3
+(define (product-from-minus-11 n) (cond
+                                    [(= n -11) 1]
+                                    [else (* n (product-from-minus-11 (sub1 n)))]))
+
+;;add into tabulate function ???????
+
+;;auxillary function first
+(define (from-20 n) (cond
+                      [(= n 20) 1]
+                      [else (* n (from-20 (sub1 n)))]))
+
+;; add
+(define (tabulate-f20 n) (cond
+                           [(zero? n) empty]
+                           [else (cons (from-20 n)(tabulate-f20(sub1 n)))]))
+
+;;test
+(tabulate-f20 21)
 
