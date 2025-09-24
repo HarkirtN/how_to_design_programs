@@ -62,7 +62,7 @@
 
 
 ;;Exercise 7.2.1
-;;define structure of zoo animals i.e. spiders, elephants, monkey
+;;define structure of zoo animals i.e. spigiders, elephants, monkey
 (define-struct spider (legs space))
 (define-struct elephant (space))
 (define-struct monkeys (intelligence space))
