@@ -15,6 +15,11 @@
 (define (tax grosspay) (* grosspay 0.85))
   
 (define (netpay hours) (tax (wage hours)))
+;; hours = 1
+;; wage = 12
+;; tax = netpay = 10.20
+;; (netpay 1) = 10.20
+;; (tax (wage 1)) = 10.20
 
 (define (sum-of-coins p n d q) (/ (+ (* 1 p) (* 5 n) (* 10 d) (* 25 q)) 100))
 
