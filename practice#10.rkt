@@ -80,6 +80,6 @@
                            [else (add1 (multiply-x (sub1 n) x))]))
 (define (exponent n x) (cond
                          [(zero? x) 0]
-                         [(= n 2) (multiply x n)]
-                         [else (add1 (multiply x n) (exponent (sub1 n) x))]))
+                         [(= n 2) (multiply-x x n)]
+                         [else (and (add1 (multiply-x x n)) (exponent (sub1 n) x))]))
 
