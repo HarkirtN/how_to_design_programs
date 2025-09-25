@@ -135,40 +135,71 @@
 ;;exercise 14.2.1
 (define-struct node (ssn name left right))
 
-(define-struct BT (make-node soc pn lft rgt))
 
 (define (contains-n? n node) (cond
                              [(false? node) empty]
-                             [else (or (symbol=? n (node-ssn node))
+                             [else (or (= n (node-ssn node))
                                         (or (contains-n? n (node-left node)) (contains-n? n (node-right node))))]))
 
 ;;exercise 14.2.2
 (define (search-bt n BT) (cond
                           [(false? BT) empty]
                           [else (cond
-                                  [(contains-n? n (node-ssn BT)) (BT-pn BT)]
+                                  [(contains-n? n (node-ssn BT)) (and (= n (node-ssn BT)) (node-name BT))]
                                   [else false])]))
-
+;;test
+;;(search-bt 29 (make-node 63 'd
+                    ;; (make-node 29 'c
+                               ;; (make-node 15 'b
+                                          ;; (make-node 10 'a null null)(make-node 24 'aa null null))null)
+                    ;; (make-node 89 'cc
+                               ;; (make-node 77 'bb null null) (make-node 95 'bbb
+                                                                          ;;(make-node 99 'dd null null) null))))
 ;;exercise 14.2.3
 (define (in-order BT) (cond
                         [(false? BT) empty]
                         [else (append (in-order (node-left BT)) (cons (node-ssn BT) (in-order (node-right BT))))]))
 
 ;;test
-(in-order (make-node 63 'd
-                     (make-node 29 'c
-                                (make-node 15 'b
-                                           (make-node 10 'a false false)(make-node 24 'aa false false))false)
-                     (make-node 89 'cc
-                                (make-node 77 'bb false false) (make-node 95 'bbb
-                                                                          (make-node 99 'dd false false) false))))
+;;(in-order (make-node 63 'd
+                    ;; (make-node 29 'c
+                        ;;        (make-node 15 'b
+                         ;;                  (make-node 10 'a false false)(make-node 24 'aa false false))false)
+                   ;;  (make-node 89 'cc
+                          ;;      (make-node 77 'bb false false) (make-node 95 'bbb
+                                                                       ;;   (make-node 99 'dd false false) false))))
 
 ;;exercise 14.2.4
+;;(define (search-bst n BST) (cond
+                             ;;[(false? BST) empty]
+                             ;;[else (cond
+                                     ;;[(and (> n (node-ssn BST)) (search-bst n (node-left BST))) true]
+                                     ;;[(and (< n (node-ssn BST)) (search-bst n (node-right BST))) true]
+                                     ;;[(= n (node-ssn BST)) (node-name BST)]
+                                     ;;[else false])]))
+
 (define (search-bst n BST) (cond
                              [(false? BST) empty]
-                             [else (cond
-                                     [(and (> n (node-ssn BST)) (search-bst (node-left BST))) (node-name BST)]
-                                     [(and (< n (node-ssn BST)) (search-bst (node-right BST))) (node-name BST)]
-                                     [else false])]))
-
+                             [else (or (= (node-ssn BST) n) (search-bst n (node-ssn BST)))]))
 ;;test
+ ;;(search-bst (make-node 10 'a (make-node 15 'b (make-node 24 'c (make-node 29 'd (make-node 63 'e (make-node 77 'f (make-node 89 'g (make-node 99 'h (make-node 95 'i
+                                                                                                                                                ;; false false)
+                                                                                                                                                ;; false)
+                                                                                                                              ;;  false)
+                                                                                                            ;;   false)
+                                                                                            ;;  false)
+                                                                           ;;   false)
+                                                          ;;   false)
+                                          ;;   false)
+                          ;;  false) 89)
+;;first attempt
+;;(define (create-bst B N S) (list (make-node N S false B)))
+
+(define (create-bst B N S) (cond
+                             [(false? B) (list (make-node N S false false))]
+                             [(> (node-ssn B) N) (list (make-node N S false (create-bst B N S)))]
+                             [else (list (make-node N S (create-bst B N S) false))]))
+
+
+(create-bst false 66 'a)
+(create-bst (create-bst false 66 'a) 53 'b)
