@@ -48,7 +48,9 @@
 ;;numeric? : scheme expression -> boolean
 (define (numeric? expression) (cond
                                 [(empty? expression) true]
-                                [(numeric? (number? expression)) true]
+                                [(mul? expression) (and (number? (mul-left expression)) (number? (mul-right expression)))]
+                                [(add? expression) (and (number? (add-left expression)) (number? (add-right expression)))]
+                                ;;[(and (numeric? (mul? expression)) (numeric? (add? expression)))]
                                 [else false]))
 
 ;;test
@@ -66,10 +68,56 @@
 
 (define (evaluate-expression expression) (cond
                                            [(empty? expression) 0]
-                                           [(numeric? expression) (evaluate-expression (rest expression))]
+                                           [(numeric? expression) (evaluate-expression (list (+ (add-left expression) (add-right expression))  (* (mul-left expression) (mul-right expression))))]
                                            [else (error 'evaluate-expression "expected number given variable")]))
 
 ;;test
 (evaluate-expression (make-add 3 5))
 (evaluate-expression (make-mul 4 4))
 (evaluate-expression (make-add 4 (make-mul 1 2)))
+
+;;Exercise 15.1
+;; if the family tree was switched to structure where descend through grandparents to children then the tree/data def will be different
+(define-struct parent (children name date eyes))
+;; then it will require a referential def because they maybe multiple children (list within a list)
+;;(define children (p loc))
+
+;;revised family tree
+(define gustav (make-parent empty 'gustav 1988 'brown))
+
+  (define fred&eva (list gustav))
+
+(define adam (make-parent empty 'adam 1950 'yellow))
+(define dave (make-parent empty 'dave 1955 'black))
+(define eva (make-parent fred&eva 'eva 1965 'blue))
+(define fred (make-parent fred&eva 'fred 1966 'pink))
+
+  (define carl&bettina (list adam dave eva))
+
+(define carl (make-parent carl&bettina 'carl 1926 'green))
+(define bettina (make-parent carl&bettina 'bettina 1926 'green))
+
+;;to find blue-eyed ancestor in all structures
+(define (blue-parents a-parent) (cond
+                                  [(symbol=? 'blue (parent-eyes a-parent)) true]
+                                  [else (blue-children (parent-children a-parent))]))
+
+(define (blue-children aloc) (cond
+                               [(empty? aloc) false]
+                               [else (cond
+                                       [(blue-parents (first aloc)) true]
+                                       [else (blue-children (rest aloc))])]))
+
+(define (how-far a-parent) (cond
+                            [(+ 1 (blue-parents a-parent)) (how-far (parent-children a-parent))]
+                            [else false]))
+
+;;count decendents including parent
+(define (count-decendents a-parent) (cond
+                                      [(empty? a-parent) 0]
+                                      [else (+ 1 (count-decendents (parent-children a-parent)))]))
+
+;;count decendents excluding parent
+(define (count-decendents2 a-parent) (cond
+                                       [(empty? a-parent) 0]
+                                       [(count-decendents2 (parent-children a-parent)) (+ 1 (parent-children a-parent))]))
