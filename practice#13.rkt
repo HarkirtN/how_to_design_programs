@@ -72,9 +72,9 @@
                                            [else (error 'evaluate-expression "expected number given variable")]))
 
 ;;test
-(evaluate-expression (make-add 3 5))
-(evaluate-expression (make-mul 4 4))
-(evaluate-expression (make-add 4 (make-mul 1 2)))
+;;(evaluate-expression (make-add 3 5))
+;;(evaluate-expression (make-mul 4 4))
+;;(evaluate-expression (make-add 4 (make-mul 1 2)))
 
 ;;Exercise 15.1
 ;; if the family tree was switched to structure where descend through grandparents to children then the tree/data def will be different
@@ -108,16 +108,121 @@
                                        [(blue-parents (first aloc)) true]
                                        [else (blue-children (rest aloc))])]))
 
+;;exercise 15.1.2
+;; how-far : structure -> boolean
+;;to compute how far removed from the parent is a blue eyed decendent
+
 (define (how-far a-parent) (cond
-                            [(+ 1 (blue-parents a-parent)) (how-far (parent-children a-parent))]
-                            [else false]))
+                             [(blue-parents a-parent) 0]
+                             [else (cond
+                                [(blue-children (parent-children a-parent)) 1]
+                                [else false])]))
+                             
+
+;;test
+(boolean=? (how-far gustav) false)
+(= (how-far eva) 0)
+
+
+;;(define (how-far a-parent) (cond
+                            ;;[(+ 1 (blue-parents a-parent)) (how-far (parent-children a-parent))]
+                            ;;[else false]))
 
 ;;count decendents including parent
-(define (count-decendents a-parent) (cond
-                                      [(empty? a-parent) 0]
-                                      [else (+ 1 (count-decendents (parent-children a-parent)))]))
+;;count-decendents : structure -> number
 
+  (define (count-parent a-parent) (cond
+                                  [(empty? (parent-children a-parent)) 1]
+                                  [else (count-child (parent-children a-parent))]))
+
+  (define (count-child aloc) (cond
+                             [(empty? aloc) 0]
+                             [else (+ 1 (count-child (rest aloc)))]))
+  
+    (define (count-decendents a-parent) (+ (count-parent a-parent)
+                                         (count-child (parent-children a-parent))))
+
+  
 ;;count decendents excluding parent
-(define (count-decendents2 a-parent) (cond
-                                       [(empty? a-parent) 0]
-                                       [(count-decendents2 (parent-children a-parent)) (+ 1 (parent-children a-parent))]))
+;; exclude-parent : structure -> number
+
+  (define (count-parent2 a-parent) (cond
+                                  [(empty? (parent-children a-parent)) 0]
+                                  [else (count-child (parent-children a-parent))]))
+
+  (define (count-child2 aloc) (cond
+                             [(empty? aloc) 0]
+                             [else ( - 1 (+ 1 (count-child (rest aloc))))]))
+  
+
+     (define (exclude-parent a-parent) (+ (count-parent2 a-parent)
+                                         (count-child2 (parent-children a-parent))))
+
+;;test
+(= (count-decendents fred) 2)
+(= (exclude-parent fred) 1)
+
+;;exercise 15.3.1
+
+(define-struct wp (header body))
+
+;;template
+;;(define (fun-wp webpage) (... (wp-header webpage)...
+                             ;; (wp-body webpage) ...))
+
+;;(define (fun-doc alod) (cond
+                       ;;  [(empty? alod) ...]
+                       ;;  [else ...(fun-wp (first alod))... (fun-doc (rest alod)) ...]))
+
+;; size2 : webpage -> number
+;; to compute the numbers of words within a webpage
+  (define (words-wp webpage) (+ (symbol? (wp-header webpage))
+                                (words-doc (wp-body webpage))))
+
+  (define (words-doc alod) (cond
+                              [(empty? alod) 0]
+                              [else (+ (words-wp (first alod)) (words-doc (rest alod)))]))
+
+     (define (size2 webpage) (+ (words-wp (wp-header webpage)) (words-doc (wp-body webpage))))
+
+
+;;exercise 15.3.2
+;; wp-to-file : webpage -> list
+;; to create a list of all words in body and header of embedded webpages
+
+;;first get all the words for the headers
+(define (retrieve-header webpage) (list (symbol? (wp-header webpage)
+                             (retrieve-header-doc (wp-body webpage)))))
+
+(define (retrieve-header-doc alod) (cond
+                        [(empty? alod) empty]
+                        [(list (retrieve-header (first alod))) (retrieve-header-doc (rest alod))]))
+
+;;(define (retrieve-parent webpage) (list (symbol? (ft-parent webpage))
+                                                ;; (retrieve-embedded (ft-child webpage))))
+
+;;(define (retrieve-embedded alod) (cond
+                                     ;;[(empty? alod) true]
+                                     ;;[else (list (retrieve-header (first alod)) (retrieve-embedded (rest alod)))]))
+                                           
+(define (wp-to-file webpage) (append (retrieve-header (wp-body webpage))
+                                     (wp-header webpage)
+                                     (wp-body webpage)))
+
+;;exercise 15.3.3
+;; occurs : symbol webpage -> boolean
+;; to find whether the symbol occurs in webpages including embedded
+
+(define (occurs webpage s) [cond
+                           [(symbol=? s (wp-header webpage)) true]
+                           [(symbol=? s (wp-body webpage)) true]
+                           [else (in-doc (wp-body webpage))]
+
+(define (in-doc alod) (cond
+                        [(empty? alod) false]
+                        [else (cond
+                                [(occurs s (first alod)) true]
+                                [else (in-doc (rest alod))])]))
+
+
+
