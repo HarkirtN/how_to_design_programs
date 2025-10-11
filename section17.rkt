@@ -161,18 +161,108 @@
 ;; to compute the value of polynomial (equation) from two lists i.e. 5 * x + 17 * y + 3 * z
 
 ;;auxillary function
-(define (add-up polynomial n) (* polynomial n))
+;;(define (add-up polynomial n) (* polynomial n))
 
-(define (poly-list list1 list2) (cond
-                              [(empty? list1) empty]
-                              [else (cons (add-up (first list1) (first list2)) (poly-list (rest list1) (rest list2)))]))
+;;(define (poly-list list1 list2) (cond
+                             ;; [(empty? list1) empty]
+                             ;; [else (cons (add-up (first list1) (first list2)) (poly-list (rest list1) (rest list2)))]))
 ;;test
-(poly-list (list 5 17 3) (list 1 1 1))
+;;(poly-list (list 5 17 3) (list 1 1 1))
+
+;;(define (value list1 list2) (cond
+                            ;;  [(and (empty? list1) (empty? list2)) 0]
+                            ;;  [(poly-list list1 list2) (+ (first (poly-list list1 list2))
+                                                        ;;  (value (rest (poly-list list1 list2)) (rest (poly-list list1 list2))))]))
 
 (define (value list1 list2) (cond
-                              [(and (empty? list1) (empty? list2)) 0]
-                              [(poly-list list1 list2) (+ (first (poly-list list1 list2))
-                                                          (value (rest (poly-list list1 list2)) (rest (poly-list list1 list2))))]))
-
+                              [(or (empty? list1) (empty? list2)) 0]
+                              [else (+ (* (first list1) (first list2)) (value (rest list1) (rest list2)))]))
 ;;test
 (value (list 5 17 3) (list 1 1 1))
+
+;;exercise 17.7.1
+;;data definition, the coefficients can be either:
+                            ;; <= 0
+                            ;; >= 0
+
+;;structure
+(define-struct definitions (name variable expression)) ;; symbol symbol expression
+(define (f x) (+ 3 x)) ;;= name parameter (expression)
+(define (g x) (* 3 x))
+
+;;exercise 17.7.3
+;; evaluate-one-def : scheme-expression definition -> number
+(define-struct add(left right))
+(define-struct mul (left right))
+
+;;...(p-name a-p)...
+;;...(p-variable a-p)...
+;;...(p-expression a-p)...
+
+;;(define (evaluate-one-def a-p) (cond
+                                 ;; [(variable? p-expression) (error 'evaluate-one-def "variable found")]
+                                 ;; [else (cond [(add? p-expression) (+ (add-left (p-expression a-p)) (add-right (p-expression a-p)))]
+                                            ;;  [(mul? p-expression) (* (mul-left (p-expression a-p)) (mul-right (p-expression a-p)))]
+                                            ;;  [(and (mul? p-expression) (add? p-expression)) (and (evaluate-one-def(first p-expression)) (evaluate-one-def(rest p-expression)))])]))
+
+;;(define (substitute value expression) (cond
+                                    ;;  [(empty? expression) empty]
+                                    ;;  [(or (variable? (first expression) (cons (substitute (first expression) value)
+                                                                                                 ;;  (substitute (rest expression) value))))]))
+;;exercise 17.8.2
+;; simiplify the function list=? that compares two lists to ensure they are of equal length
+(define (list=? a-list b-list) (cond
+                                 [(and (empty? a-list) (empty? b-list)) true]
+                                 [(and (empty? a-list) (cons? b-list)) false]
+                                 [(and (cons? a-list) (empty? b-list)) false]
+                                 [(and (cons? a-list) (cons? b-list))
+                                       (and (= (first a-list) (first b-list))
+                                            (list=? (rest a-list) (rest b-list)))]))
+
+(define (list=?? a-list b-list) (cond
+                                  [(and (empty? a-list) (empty? b-list)) true]
+                                  [(or (empty? a-list) (empty? b-list)) false]
+                                  [else (and (= (first a-list) (first b-list)) (list=?? (rest a-list) (rest b-list)))]))
+
+;;test
+(list=?? empty empty)
+(list=?? empty (cons 1 empty))
+(list=?? (cons 1 (cons 2 (cons 3 empty))) (cons 1 (cons 2 (cons 3 empty))))
+
+;;exercise 17.8.3
+;; sym-list=? : los1 los2 -> boolean
+;; to compare two lists of symbols to check they are equal in length
+
+(define (sym=? los1 los2) (cond
+                            [(and (empty? los1) (empty? los2)) true]
+                            [(or (empty? los1) (empty? los2)) false]
+                            [else (and (symbol=? (first los1) (first los2)) (sym=? (rest los1) (rest los2)))]))
+
+;;test
+(sym=? empty empty)
+(sym=? empty (cons 'a (cons 'b empty)))
+(sym=? (cons 'a (cons 'b (cons 'c empty))) (cons 'a (cons 'b (cons 'c empty))))
+
+;;exercise 17.8.4
+;; contains-same-numbers : list1 list2 -> boolean
+;;(define (contains-same-number list1 list2) (cond
+                                            ;; [(and (empty? list1) (empty? list2)) true]
+                                            ;; [(or (empty? list1) (empty? list2)) false]
+                                            ;; [else (or (contains-same-number list1 list2)
+                                                      ;; (= (first list2) (first list1)))]))
+                                                    
+
+
+(define (contains-same-numbers list1 list2)
+  (presorted-list=? (sort list1 <) (sort list2 <)))
+
+(define (presorted-list=? list1 list2)
+  (cond
+    [(empty? list1) (empty? list2)]
+    [(cons? list1) (and (cons? list2)
+                        (= (first list1) (first list2)) (presorted-list=? (rest lis1) (rest lis2)))]))
+                                                    
+;;test
+(list=? (list 1 2 3) (list 3 2 1))
+(list=? (list 2 3 5) (list 5 2 3))
+(list=? (list 1 2 3) (list 2 3 4))
