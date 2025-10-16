@@ -61,13 +61,13 @@
 
 (define (looking-up a-tree) (local ((define (look a-tree) (cond
                                                             [(child? (child-mother a-tree)) (list (check-eyes2 (direction-mother a-tree)) (check-eyes2 (direction-father a-tree)))] 
-                                                            [else false]
+                                                            [else false]))
                                     
                                     (define (look-up-ancestors a-tree) (cond
                                                                            [(empty? a-tree) false]
                                                                            [else (and (look (first a-tree)) (look-up-ancestors (rest a-tree)))])))
         ;;__________________________________________________________________________________________________________________________________
-                                      (looking-up a-tree)))))
+                                (looking-up a-tree)))       
 
   
 
@@ -87,10 +87,13 @@
 ;;_____________________________________________________________________________________________
                                 (cons (* (expt 10p) a-digit) (mult10 the-rest)))]))
 
+
 ;;extract1 : inventory -> inventory
 ;;to create an inventory from an-inv for all items less than $1
 (define (extract1 an-inv) (cond
                             [(empty? an-inv) empty]
-                            [else (cond
-                                    [(<= (ir-price (first an-inv)) 1.00) (cons (first an-inv) (extract1 (rest an-inv)))]
-                                    [else (extract1 (rest an-inv))])]))
+                            [else (local ((define extract (extract1 (rest an-inv))))
+;;___________________________________________________________________________________________________________________________________  
+                                    (cond
+                                      [(<= (ir-price (first an-inv)) 1.00) (cons (first an-inv) extract)]
+                                      [else extract]))]))
