@@ -1,0 +1,96 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname section18) (read-case-sensitive #t) (teachpacks ((lib "convert.rkt" "teachpack" "htdp") (lib "guess-gui.rkt" "teachpack" "htdp") (lib "guess.rkt" "teachpack" "htdp") (lib "draw.rkt" "teachpack" "htdp") (lib "dir.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "convert.rkt" "teachpack" "htdp") (lib "guess-gui.rkt" "teachpack" "htdp") (lib "guess.rkt" "teachpack" "htdp") (lib "draw.rkt" "teachpack" "htdp") (lib "dir.rkt" "teachpack" "htdp")) #f)))
+;;exercise 18.1.3
+(define-struct child (father mother name date eyes))
+
+;;older gen
+(define carl (make-child empty empty 'carl 1926 'blue))
+(define dorothy (make-child empty empty 'dorothy 1926 'blue))
+
+;;mid gen
+(define adam (make-child carl dorothy 'adam 1950 'green))
+(define maggie (make-child carl dorothy 'maggie 1965 'green))
+(define gen (make-child empty empty 'gen 1967 'brown))
+
+;;young gen
+(define gustav (make-child adam gen 'gustav 1988 'brown))
+
+;;to determine proper ancestors have blue eyes
+;;(define (blue-eyed-ancestor a-tree) (cond
+                                      ;;[(empty? a-tree) false]
+                                      ;;[else (symbol=? 'blue (child-eyes a-tree))]))
+
+;;(define (check-eyes a-tree) (cond
+                              ;;[(blue-eyed-ancestor (child-mother a-tree)) true]
+                              ;;[(blue-eyed-ancestor (child-father a-tree)) true]
+                              ;;[else false]))
+
+;;test
+;;(blue-eyed-ancestor carl)
+;;(check-eyes adam)
+;;(check-eyes maggie)
+;;(check-eyes carl)
+
+(define-struct direction (mother father))
+;;list : empty
+     ;;  direction & list of symbols
+
+;;template
+;; (define (fun a-direction) (fun-fun(direction-mother a-direction))
+                            ;;(fun-fun (direction-father a-direction)))
+
+;;(define (fun-fun alos) (cond
+                          ;; [(empty? alos) false]
+                          ;; [(fun (first alos)) (fun-fun (rest alos))....]))
+
+(define (check-eyes2 a-tree) (local  ((define (blue-eyed-ancestor a-tree) (cond
+                                       [(empty? a-tree) false]
+                                       [else (symbol=? 'blue (child-eyes a-tree))]))
+                                     
+                                     (define (check-eyes a-tree) (cond
+                                       [(blue-eyed-ancestor (child-mother a-tree)) true]
+                                       [(blue-eyed-ancestor (child-father a-tree)) true]
+                                       [else false])))
+ ;;____________________________________________________________________________________________________                               
+                             (check-eyes2 a-tree)))
+
+
+;;to-blue-eyed-ancestor :a-tree -> path or false
+;;to compute the path from a-tree to blue-eyed ancestor
+
+(define (looking-up a-tree) (local ((define (look a-tree) (cond
+                                                            [(child? (child-mother a-tree)) (list (check-eyes2 (direction-mother a-tree)) (check-eyes2 (direction-father a-tree)))] 
+                                                            [else false]
+                                    
+                                    (define (look-up-ancestors a-tree) (cond
+                                                                           [(empty? a-tree) false]
+                                                                           [else (and (look (first a-tree)) (look-up-ancestors (rest a-tree)))])))
+        ;;__________________________________________________________________________________________________________________________________
+                                      (looking-up a-tree)))))
+
+  
+
+(define (to-blue-eyed-ancestor a-tree) (cond
+                                         [(empty? a-tree) false]
+                                         [else (local ((define m (to-blue-eyed-ancestor (rest a-tree))))
+                                                  (cond
+                                                    [(child? (looking-up a-tree) (... ))]
+                                                    [else false]))]))
+
+;;exercise 18.1.15
+(define (mult10 alon) (cond
+                        [(empty? alon) empty]
+                        [else (local ((define a-digit (first alon))
+                                      (define the-rest (rest alon))
+                                      (define p (length the-rest)))
+;;_____________________________________________________________________________________________
+                                (cons (* (expt 10p) a-digit) (mult10 the-rest)))]))
+
+;;extract1 : inventory -> inventory
+;;to create an inventory from an-inv for all items less than $1
+(define (extract1 an-inv) (cond
+                            [(empty? an-inv) empty]
+                            [else (cond
+                                    [(<= (ir-price (first an-inv)) 1.00) (cons (first an-inv) (extract1 (rest an-inv)))]
+                                    [else (extract1 (rest an-inv))])]))
