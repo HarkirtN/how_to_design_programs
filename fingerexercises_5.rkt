@@ -59,24 +59,55 @@
 ;;for bonary trees instead of empty should choose false
 (define-struct node (ssn name left right))
 
-;;contains-bt? : node number -> boolean
-;;to search the binary tree
-(define (contains-bt? n node) (cond
-                              [(false? node) false]
-                              [(= n (node-ssn node)) true]
-                              [else false]))
+;;creating a binary tree
+(define par (make-node 2 'par false false))
+(define hri (make-node 4 'hri false 'par))
+(define kat (make-node 8 'kat false false))
+(define ash (make-node 5 'ash 'kat 'hri))
+(define root ash)
 
-;; search-bt : node number -> symbol
+;;contains-bt? : node number -> boolean - first attempt again
+;;to search the binary tree
+;;(define (contains-bt? n node) (cond
+                             ;; [(false? node) false]
+                             ;; [(= n (node-ssn node)) true]
+                             ;; [else false]))
+
+;; search-bt : node number -> symbol first attempt again 
 ;;to search the binary tree for number and then produce name of the node 
-(define (search-bt n node)(cond
-                             [(false? node) empty]
-                             [(contains-bt? n node) (node-name node)]
-                             [(contains-bt? n (node-left node)) (node-name node)]
-                             [(contains-bt? n (node-right node)) (node-name node)]
-                             [else false]))
+;;(define (search-bt n node)(cond
+                            ;; [(false? node) empty]
+                            ;; [(contains-bt? n node) (node-name node)]
+                            ;; [(contains-bt? n (node-left node)) (node-name node)]
+                            ;; [(contains-bt? n (node-right node)) (node-name node)]
+                            ;; [else false]))
+
+(define (contains-bt? n node) (cond
+                                [(false? node) empty]
+                                [(= n (node-ssn node)) (node-name node)]
+                                [else (local ((define search-left (contains-bt? n (node-left node)))
+                                              (define search-right (contains-bt? n (node-right node))))
+                                        (cond
+                                          [(symbol? search-left) search-left]
+                                          [(symbol? search-right) search-right]
+                                          [else false]))]))
 
 ;;test
-(search-bt 77 (make-node 63 'd
+(contains-bt? 99 (make-node 63 'd
+                    (make-node 29 'c
+                               (make-node 15 'b
+                                          (make-node 10 'a false false)(make-node 24 'aa false false))false)
+                    (make-node 89 'cc
+                                (make-node 77 'bb false false) (make-node 95 'bbb
+                                                                          (make-node 99 'dd false false) false))))
+;; in-order : BT -> list
+;;so its saying recurse into the left till you get to the leaf then cons the ssn for left first then right 
+(define (in-order a-tree) (cond
+                            [(false? a-tree) empty]
+                            [else (append (in-order (node-left a-tree)) (cons (node-ssn a-tree) (in-order (node-right a-tree))))]))
+                                    
+ ;;test
+ (in-order (make-node 63 'd
                     (make-node 29 'c
                                (make-node 15 'b
                                           (make-node 10 'a false false)(make-node 24 'aa false false))false)
@@ -84,3 +115,32 @@
                                 (make-node 77 'bb false false) (make-node 95 'bbb
                                                                           (make-node 99 'dd false false) false))))
 
+;;search-bst : BST (ordered) -> symbol
+(define (search-bst? n a-tree) (cond
+                               [(false? a-tree) empty]
+                               [(= n (node-ssn a-tree)) (node-name a-tree)]
+                               [else (local ((define left-search (search-bst? n (node-left a-tree)))
+                                             (define right-search (search-bst? n (node-right a-tree))))
+                                       (cond
+                                         [(< n (node-ssn a-tree)) left-search]
+                                         [else right-search]))]))
+  ;;test
+(search-bst? 95 (make-node 63 'd
+                    (make-node 29 'c
+                               (make-node 15 'b
+                                          (make-node 10 'a false false)(make-node 24 'aa false false))false)
+                    (make-node 89 'cc
+                                (make-node 77 'bb false false) (make-node 95 'bbb
+                                                                          (make-node 99 'dd false false) false))))
+
+(define (create-bst? B N S) (cond
+                              [(false? B) (make-node N S false false)]
+                              [else (local ((define go-left (create-bst? (make-node N S B false) N S))
+                                            (define go-right (create-bst? N S (make-node N S false B))))
+                                      (cond
+                                        [(< N B) go-left]
+                                        [else go-right]))]))
+
+;;test
+(create-bst? false 66 'a)
+(create-bst? (create-bst? false 66 'a) 53 'b) ;; should be (make-node 66 'a (make-node 53 'b false false) false)
