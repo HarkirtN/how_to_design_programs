@@ -106,10 +106,10 @@
 
 (define (sort-quick-sort lst) (cond
                                   [(empty? lst) empty]
-                                  (local((define (quicker-sort lst) (cond
+                                  [else (local((define (quicker-sort lst) (cond
                                                                    [(empty? lst) empty]
                                                                    [else (append (quicker-sort (small lst (first lst))) (list (first lst))
-                                                                                  (quicker-sort (larger lst (first lst))))]))
+                                                                                  (quicker-sort (large lst (first lst))))]))
                                       (define (small lst TH) (cond
                                                                [(empty? lst) empty]
                                                                [else (if (< (first lst) TH) (cons (first lst) (small (rest lst) TH))
@@ -118,17 +118,24 @@
                                                                [(empty? lst) empty]
                                                                [else (if (> (first lst) TH) (cons (first lst) (large (rest lst) TH))
                                                                          (large (rest lst) TH))]))
-                                      (define (sorting-small lst) (cond
-                                                                    [(empty? lst) empty]
-                                                                    [else (inserting (first lst) (sorting-small (rest lst)))]))
-                                      (define (inserting-small lst TH) (cond
-                                                                         [(empty? lst) (cons TH empty)]
-                                                                         [else (cond
-                                                                                 [(>= TH (first lst)) (cons TH lst)]
-                                                                                 [(< TH (first lst)) (cons (first lst) (inserting-small TH (rest lst)))])]))
+                                      (define (sorted alon) (cond
+                                                  [(empty? alon) empty]
+                                                  [else (insert (first alon) (sorted (rest alon)))]))
+
+                                      (define (insert an alon) (cond
+                                                       [(empty? alon) (list an)]
+                                                       [else (cond
+                                                               [(< an (first alon)) (cons an alon)]
+                                                               [else (cons (first alon) (insert an (rest alon)))])]))
+                                      
                                       (define (generative-fun problem) (cond
                                                                         [(empty? problem) 0]
                                                                         [(not (list? problem)) 1]
                                                                         [else (+ (generative-fun (first problem)) (generative-fun (rest problem)))])))
-                                  [(< (generative-fun lst) 30) (sorting-small lst)]
-                                  [(> (generative-fun lst) 30) (quicker-sort lst)])))
+                                          (cond
+                                  [(< (generative-fun lst) 30) (sorted lst)]
+                                  [(> (generative-fun lst) 30) (quicker-sort lst)]))]))
+
+;;test
+(sort-quick-sort (list 1 2 3 7 1 2 4 6 8 9 1 2 3 7 1 2 4 6 8 9 1 2 3 7 1 2 4 6 8 9 7 2))
+(sort-quick-sort (list 1 2 3 7 1 2 4 6 8 9 5 4 2))
