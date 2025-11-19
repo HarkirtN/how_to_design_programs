@@ -73,6 +73,8 @@ empty ;;= (list empty)
                                      [else (cond
                                              [(symbol=? (first a-file) NEWLINE) (rest a-file)]
                                              [else (remove-first-line (rest a-file))])]))
+;;test
+(file->lines (list 'a 'b 'c 'NL 'd 'e 'NL 'f 'g))
 
 ;;exercise 27.2.2
 ;; abstract the first and remove-first
@@ -97,6 +99,9 @@ empty ;;= (list empty)
 ;;exercise 27.2.3
 ;; files : file -> (listof numbers)
 ;; to convert a file into a list of numbers
+
+(define-struct rr (table costs))
+
 (define (files a-file) (cond
                          [(empty? a-file) empty]
                          [else (cons (first-nums a-file) (files (remove-nums a-file)))]))
@@ -104,14 +109,68 @@ empty ;;= (list empty)
 (define (first-nums a-file) (cond
                               [(empty? a-file) empty]
                               [else (cond
-                                      [(symbol=? (first a-file) NEWLINE) empty]
-                                      [else (cons (first a-file) (first-nums (rest a-file)))])]))
+                                      [(number? (first a-file)) (cons (first a-file) (first-nums (rest a-file)))]
+                                      [else empty])]))
 
 (define (remove-nums a-file) (cond
                                [(empty? a-file) empty]
                                [else
                                 (cond
-                                  [(symbol=? (first a-file) NEWLINE) (rest a-file)]
+                                  [(symbol? (first a-file)) (rest a-file)]
                                   [else (remove-nums (rest a-file))])]))
 ;;test
-(files (list 2.30 4.00 12.50 13.50 'NL 4.00 18.00 'NL 2.30 12.50))
+(files (list 1 2.30 4.00 12.50 13.50 'NL 2 4.00 18.00 'NL 3 2.30 12.50))
+
+(define-struct rr (table costs))
+
+(define (file->list-of-checks a-file)
+  (cond
+    [(empty? a-file) empty]
+    [else (cons (list->rr (file->first a-file))
+                (file->list-of-checks (file->rest a-file)))]))
+
+;; a convenience method for creating a rr from a list of numbers 
+(define (list->rr a-list)
+  (make-rr (first a-list) (rest a-list)))
+
+;; skip-line -> list -> list
+;; Creates a list from the numbers before the next newline.
+(define (file->first a-file)
+  (cond
+    [(empty? a-file) empty]
+    [else
+     (cond
+       [(newline? (first a-file)) empty]
+       [else (cons (first a-file) (file->first (rest a-file)))])]))
+
+;; skip-line -> list -> list
+;; Given a file skips the first line, returning a file with one less line.
+(define (file->rest a-file)
+  (cond
+    [(empty? a-file) empty]
+    [else
+     (cond
+       [(newline? (first a-file)) (rest a-file)]
+       [else (file->rest (rest a-file))])]))
+
+;; newline? -> any -> bool
+;; Returns true if x is the newline symbol
+(define (newline? x)
+  (and (symbol? x)
+       (symbol=? x 'NL)))
+
+;; Assert empty state
+(equal? (file->list-of-checks empty) empty)
+
+;; Assert table that hasnt spent anything yet
+(equal? (file->list-of-checks (list 1 'NL)) (list (make-rr 1 empty)))
+
+;; Assert table that has spent some money
+(equal? (file->list-of-checks (list 1 20 'NL)) (list (make-rr 1 (list 20))))
+
+;; Assert the case from the book with many tables
+(equal?
+ (file->list-of-checks (list 1 2.30 4.00 12.50 13.50 'NL 2 4.00 18.00 'NL 3 2.30 12.50))
+ (list (make-rr 1 (list 2.30 4.00 12.50 13.50))
+       (make-rr 2 (list 4.00 18.00))
+       (make-rr 3 (list 2.30 12.50))))
