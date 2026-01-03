@@ -41,3 +41,78 @@
 ;; i.e (55 x 10^0) + (55 x 10^0) = 110, but we cant do (create 11 +1 0) given the parameters
 ;; instead (create-inex 11 +1 1)
 
+;; inex multiplication
+;; multipy the mantissa together and add the exponents
+;; it will approximate if it doesnt have the exact equilvalent
+
+;; exercise 33.1.1
+;; inex+ : inex inex -> number
+;; adds the inex with same exponent
+
+(define (inex+ a b) (cond
+                      [(and (= (inex-exponent a) (inex-exponent b)) (= (inex-sign a) (inex-sign b))) (make-inex (+ (inex-mantissa a) (inex-mantissa b))
+                                                                                                                (inex-sign a)
+                                                                                                                (inex-exponent a))]
+                      [else (inex-add-dif-signs a b)]))
+
+(define (inex-add-dif-signs inex-a inex-b) (cond
+                                             [(...)( ... (+ (inex-to-num inex-a) (inex-to-num inex-b)))]
+                                             [else (error 'inex-add-dif-signs "result is out of range")]))
+
+
+;;test
+(inex+ (create-inex 1 +1 0) (create-inex 1 +1 0))
+;;(inex-add-dif-signs (create-inex 1 -1 1) (create-inex 1 +1 1))
+
+;; sum of list left to right
+;; sum-L->R : list -> number
+(define (sum-L->R list) (cond
+                          [(empty? list) 0]
+                          [else (+ (sum-L->R (rest list)) (first list))]))
+
+(define (sum-R->L list) (cond
+                          [(empty? list) 0]
+                          [else (+ (first list) (sum-R->L (rest list)))]))
+;;test
+(sum-L->R (list 1 2 3))
+(sum-R->L (list 1 2 3))
+
+(define janus (list 31.0
+        #i2e+34
+        #i-1.2345678901235e+80
+        2749.0
+        -2939234.0
+        #i-2e+33
+        #i3.2e+270
+        17.0
+        #i-2.4e+270
+        #i4.2344294738446e+170
+        1.0
+        #i-8e+269
+        0.0
+        99.0))
+
+(sum-L->R janus)
+(sum-R->L janus)
+
+;;overflow when arithmetic produces numbers that are too large to be represented
+;; some programs signal error in scheme it is an infinity symbol 
+(define (inexact-plus inex1 inex2) (cond
+                                     [(and (<= 00 inex1 99) (<= 00 inex2 99)) (+ inex1 inex2)]
+                                     [else 'overflow]))
+
+;;test
+(equal? (inexact-plus 'overflow 'overflow) 'overflow)
+(equal? (inexact-plus 2 33) 35)
+(equal? (inexact-plus 25 'overflow) 'overflow)
+(equal? (inexact-plus 55 55) 'overflow)
+
+(define (num-to-inex N) (make-inex (inex-mantissa (/ N 10))
+                                   (inex-sign ())
+                                   (inex-exponent ))
+
+;;test
+(equal? (num-to-inex 10) (make-inex 10 +1 0))
+(equal? (num-to-inex 120) (make-inex 12 +1 1))
+(equal? (num-to-inex 1,000,000) (make-inex 10 +1 6))
+(equal? (num-to-inex 135) (make-inex ))
