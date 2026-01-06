@@ -45,7 +45,7 @@
 ;; try to find midpoint = a+b / 2, which partitions a & b. We use the midpoint halving strategy multiple times to find the root
 
 (define (find-root f left right) (cond
-                                   [(<= (- right left) 2) left] ;;termination statement that it is solved once the distance between left and right is <= TOLERANCE
+                                   [(<= (- right left) TOLERANCE) left] ;;termination statement that it is solved once the distance between left and right is <= TOLERANCE
                                    [else (local ((define mid (/ (+ left right) 2)))
                                            (cond
                                              [(<= (f mid) 0 (f right)) (find-root mid right)]
