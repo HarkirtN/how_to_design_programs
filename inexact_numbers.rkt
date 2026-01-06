@@ -108,7 +108,6 @@
 (equal? (inexact-plus 55 55) 'overflow)
 
 (define (num-to-inex N) (make-inex (inex-mantissa (/ N 10))
-                                   (inex-sign ())
                                    (inex-exponent ))
 
 ;;test
