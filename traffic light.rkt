@@ -48,9 +48,9 @@
 
 ;;required to provide functions for each traffic light bulb 'off' phase
 (define (light-off colour) (cond
-                             [(symbol=? colour 'red) (and (draw-circle (make-posn X-BULB Y-RED) BULB-RADIUS 'red) (clear-solid-disk 'red))]
-                             [(symbol=? colour 'yellow) (and (draw-circle (make-posn X-BULB Y-YELLOW) BULB-RADIUS 'yellow) (clear-solid-disk 'yellow))]
-                             [(symbol=? colour 'green) (and (draw-circle (make-posn X-BULB Y-GREEN) BULB-RADIUS 'green) (clear-solid-disk 'green))]))
+                             [(symbol=? colour 'red) (and (draw-circle (make-posn X-BULB Y-RED) BULB-RADIUS 'red) (clear-solid-disk (make-posn X-BULB Y-RED) BULB-RADIUS 'white))]
+                             [(symbol=? colour 'yellow) (and (draw-circle (make-posn X-BULB Y-YELLOW) BULB-RADIUS 'yellow) (clear-solid-disk (make-posn X-BULB Y-RED) BULB-RADIUS 'white))]
+                             [(symbol=? colour 'green) (and (draw-circle (make-posn X-BULB Y-GREEN) BULB-RADIUS 'green) (clear-solid-disk (make-posn X-BULB Y-RED) BULB-RADIUS 'white))]))
 
 ;; combine (and (exp1) (exp2)) to create an effect of turning off the corresponding colour
 (define (clear-bulb colour) (cond
