@@ -1,0 +1,16 @@
+
+(define (find-route origin destination graph) (cond
+                                                [(symbol=? origin destination) (list destination)]
+                                                [else (local ((possible-route (find-route (neighbours origin graph) destination graph)))
+                                                        (cond
+                                                          [(boolean? possible-route) true]
+                                                          [else (cons origin possible-route)]))]))
+
+;;adapt vector-ref into find-route
+(define (finding-route origin destination graph) (cond
+                                                   [(symbol=? origin destination) (list destination)]
+                                                   [else (local ((possibly-route (finding-route (neighbour-vector origin graph) destination graph)))
+                                                           (cond
+                                                             [(boolean? possible-route) true]
+                                                             [else (cons origin possibly-route)]))]))
+
