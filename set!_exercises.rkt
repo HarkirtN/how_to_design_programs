@@ -50,3 +50,42 @@
   (* x y))
 
 ;;exercise 35.2
+(define x 1)
+(define y 1)
+(begin (set! x (+ x 1))
+       (set! y (- y 1))
+       (* x y))
+
+(define x 1)
+(define y 1)
+(begin (set! x 2)
+       (set! y 0)
+       (* 2 0))
+
+;;compared to nesting where order of additon and subtraction are important
+;; and nesting implies some ordering of evaluation inner to outer bracket
+(define a 5) (* (+ a 1) (- a 1))
+
+(define a 5) (* (+ 5 1) (- 5 1))
+(define a 5) (* 6 4)
+            ;; = 20
+
+;;exercise 35.2.2
+(define x 3)
+(define y 5)
+(local (( define z x))
+  (begin (set! x y)
+         (set! y z)
+         (list x y)))
+
+;;using begin we evaluate inorder
+(define x 3)
+(define y 5)
+(local ((define z x))
+  (begin (set! x 5)
+         (set! y 5)
+         (list 5 5)))
+
+;; x contains the initial value of y
+;; but y does not equal to initial value of x after the two set! expressions as all x's were replaced in the first set! with y = 5
+
