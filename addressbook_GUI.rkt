@@ -46,3 +46,34 @@
 (removing 'adam)
 (look-up 'adam address-book)
 
+;; state variables are variables that change their value which indicate a change in memory
+;; service that changes memory will need to use set!
+;; prior to changing state variables need to understand what kind of value you are dealing with and and its purpose
+
+;;addy : (listof (list symbol number))
+;; to keep track of pairs of names and phone numbers
+(define addy empty)
+
+;; addy stands for a list (cons (list 'adam 1) address-book) constructs a longer list
+;; set! changes the state variable addy of a different class of (listof (list symol number))
+(set! addy (cons (list 'amy 1) addy))
+
+;; current-light : TL-colour
+;; to track the current colour of traffic light
+(define current-light 'red)
+
+;; if we wanted to change we use set!
+(set! current-light 'green)
+
+;; some cases you may need to use a function to create a new value
+;; next-colour : TL-colour -> TL-colour
+;; to compute the next colour for traffic light
+(define (next-colour c)
+  (cond
+    [(symbol=? 'red c) 'green]
+    [(symbol=? 'green c) 'yellow]
+    [(symbol=? 'yellow c) red]))
+
+;;using auxiallry function next-colour we can then use set!
+(set! current-light (next-colour current-light))
+
