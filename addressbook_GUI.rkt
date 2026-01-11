@@ -77,3 +77,63 @@
 ;;using auxiallry function next-colour we can then use set!
 (set! current-light (next-colour current-light))
 
+;; initialiser is the first function used in execution to set the state variables into first values
+
+;;addy-i : -> void
+(define (addy-i) (set! addy empty))
+
+;;traffic-i : -> void
+(define (traffic-i) (set! current-light 'red))
+
+;;NOTE conventional rule is to place the devices into the least harmful state i.e traffic light 'red
+
+;;Effect of functions on state variables
+;;need to consider what variables the function impacts and how - it should be consistent with purpose statement
+
+;; traffic light example
+;; next : -> void
+;; effect is to change the current light from green to yellow, yellow to red and red to green
+
+;;addy example
+;; next : ->void
+;; effect is to add a (list name number) to the front of the addy-book
+
+;;NOTE write examples of what it should look like so it can help with developing the function body
+;; if addy-book is empty and
+;; (add-to-addy-book 'amy 1) is evaluated
+;; addy will become (list (list 'amy 1)) afterwards
+
+;; if (add-to-addy-book 'eve 2) is evaluated next
+;; addy will become (list (list 'eve 2) (list 'amy 1))
+
+;;the template for state changing functions should contain set!
+(define (fun-for-state-change x y z)
+  (set! a-state-variable ...)) ;; can be auxillary function
+
+;;i.e. traffic light
+(define (next) (cond
+                 [(symbol=? 'green current-light) (set! current-light 'yellow)]
+                 [(symbol=? 'yellow current-light) (set! current-light 'red)]
+                 [(symbol=? 'red current-light) (set! current-light 'green)]))
+
+;; or
+;; as above
+;; (define (next)
+;;   (set! current-colour (next-colour current-colour))
+
+;;test examples
+(begin (set! current-light 'green)
+       (next)
+       (symbol=? current-light 'yellow))
+
+(begin (set! address-book)
+       (add-to-address-book 'adah 3)
+       (equal? '(('adah 3)) address-book))
+
+;;test where you capture the curent-value-of at the beggining of an evaluation then change, then test again
+(define (test-for-address name number)
+  (local ([define current-value-of address-book])
+    (begin
+      (add-to-address-book name number)
+           (equal? (cons (list name number) current-value-of)
+                   address-book)))) ;; where you use the current-value-of to test the add-on function and compare with 
