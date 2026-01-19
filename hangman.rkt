@@ -99,9 +99,67 @@
 
 ;; modify the program so that it keeps track of all guesses
 ;; if player enters the same guess twice it will respond "you have used this guess before"
-(define (keep-track guess chosen-word) (cond
-                                         [(symbol=? guess ((list-ref chosen-word) 0)) "you've guessed this before"]
-                                         [else (keep-track (rest chosen-word))]))
+(define (keep-track guess status-word) (cond
+                                         [(symbol=? guess (list-ref status-word 0)) "you've guessed this before"]
+                                         [else (keep-track guess (rest status-word))]))
 
 ;;test
 (keep-track 'e (list 'h 'e 'l 'l 'o))
+(keep-track 'o (list 'h 'e 'l 'l 'o))
+
+;;reveal-list! : letter -> void
+;; effect is to modify the status-word based on comparison to chosen-word, status-word and guess
+(define (reveal-list! cw sw guess)
+  (local ((define (reveal-one chosen-letter status-letter) (cond
+                                                            [(symbol=? chosen-letter guess) guess]
+                                                            [else status-letter])))
+    (set! status-word (map reveal-one cw sw))))
+
+
+;; exercise 37.2.7
+;; add to hangman-guess
+(define (hangman-guess! guess) (local ((define new-status (reveal-list! chosen-word status-word guess)))
+                                (cond
+                                  [(equal? new-status status-word) 
+                                   (local ((define next-part (first body-parts-left)))
+                                     (begin
+                                       (set! body-parts-left (rest body-parts-left)) 
+                                       (cond
+                                         [(empty? body-parts-left) (list "you lost" chosen-word)]
+                                         [(keep-track guess status-word) (list (keep-track guess status-word) next-part status-word)]
+                                         [else (list "sorry" next-part status-word)])))] 
+                                  [else
+                                   (cond
+                                     [(equal? new-status chosen-word) "you won"] 
+                                     [else (begin
+                                             (set! status-word new-status) 
+                                             (list "right guess" status-word))])])))
+
+;; note that reveal-list is used to compare the status-word in hangman-guess to find whether new knowledge is uncovered
+;; the result of reveal-list is compared to chosen word again is new knowledge is found because the guess/reveal-list might have matched all letters to win
+;; both comparisons repeat reveal-one, result of reveal-one function is useful for reveal-list
+;; result of individual comparisons is needed for conditions
+
+;;can add state-variable new-knowledge that is modified by reveal-one if the guess uncovers new-knowledge
+;;new-knowledge : boolean
+;; variable that revals whether most recent application of reveal-list has provided new knowledge
+(define new-knowledge false) ;; initialisation should be false and can be switched to true if new-knowledge is revealed when reveal-list is applied
+
+;; do this by :
+;;reveal-list : word word letter -> word
+;; to compute new status word
+;; effect to set the new-knowledge to false first
+(define (reveal-listt chosen-word status-word guess)
+  (local ((define (reveal-onee chosen-letter status-letter) (cond
+                                                            [(and (symbol=? status-letter '_)(symbol=? chosen-letter guess))
+                                                             (begin (set! new-knowledge true) guess)] ;; this part changes the new-knowledge to be true if status-letter is '_
+                                                                                                      ;; AND guess matches chosen-letter
+                                                            [else status-letter])))
+    (begin (set! new-knowledge false)
+           (map reveal-onee chosen-word status-word))))
+
+;;test
+(boolean? (reveal-listt (list 'b 'a 'l 'l) (list 'b '_ 'l 'l) 'a))
+(boolean? (reveal-listt (list 'b 'a 'l 'l) (list 'b '_ 'l 'l) 'x))
+(boolean? (reveal-listt (list 'b 'a 'l 'l) (list 'b '_ 'l 'l) 'l))
+
